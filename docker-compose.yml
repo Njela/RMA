@@ -1,0 +1,51 @@
+# One command to run everything:  docker compose up --build
+x-backend: &backend
+  build: ./backend
+  env_file: [.env]
+  environment:
+    DATABASE_URL: postgresql+psycopg://rma:${POSTGRES_PASSWORD:-rma}@db:5432/rma
+    REDIS_URL: redis://redis:6379/0
+    CORS_ORIGINS: http://localhost:3000
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_started }
+
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: rma, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-rma}", POSTGRES_DB: rma }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U rma"], interval: 5s, retries: 10 }
+
+  redis:
+    image: redis:7
+
+  backend:            # FastAPI: intake, staff API, webhooks (creates tables on boot when ENV=dev)
+    <<: *backend
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/ready')"]
+      interval: 5s
+      retries: 20
+
+  worker:             # Celery: runs the pipeline (nodes 2-8)
+    <<: *backend
+    command: celery -A app.worker.celery_app worker -l info
+    depends_on: { backend: { condition: service_healthy } }
+
+  beat:               # Celery beat: SLA scan + carrier sync every 60s (node 9)
+    <<: *backend
+    command: celery -A app.worker.celery_app beat -l info
+    depends_on: { backend: { condition: service_healthy } }
+
+  frontend:           # Next.js: customer portal + staff board
+    build: ./frontend
+    ports: ["3000:3000"]
+    environment:
+      API_URL: http://backend:8000                 # server-side calls (staff key never reaches the browser)
+      NEXT_PUBLIC_API_URL: http://localhost:8000   # browser calls (public endpoints only)
+      STAFF_API_KEY: "${STAFF_API_KEY:-dev-staff-key}"
+    depends_on: [backend]
+
+volumes:
+  pgdata:

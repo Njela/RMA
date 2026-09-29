@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --paper: #f8fafc; /* slate-50 */
+    --card: #ffffff; 
+    --ink: #0f172a; /* slate-900 */
+    --muted: #64748b; /* slate-500 */
+    --line: #e2e8f0; /* slate-200 */
+    
+    --deterministic: #3b82f6; /* blue-500 */
+    --llm: #8b5cf6; /* violet-500 */
+    --auto: #10b981; /* emerald-500 */
+    --human: #0ea5e9; /* sky-500 */
+    --warn: #f59e0b; /* amber-500 */
+    --bad: #ef4444; /* red-500 */
+    
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  
+  html { 
+    background: var(--paper); 
+    color: var(--ink); 
+    font-family: var(--font); 
+    line-height: 1.5; 
+  }
+  body { margin: 0; }
+}
+
+@layer components {
+  /* Retain fallback for non-migrated parts */
+  .shell { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+  
+  .panel { 
+    background: var(--card); 
+    border: 1px solid var(--line); 
+    border-radius: 12px; 
+    padding: 24px; 
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  
+  /* Retaining some of the timeline for the board */
+  .rail { list-style: none; margin: 0; padding: 0; position: relative; }
+  .rail::before { content: ""; position: absolute; left: 11px; top: 12px; bottom: 12px; width: 2px; background: var(--line); }
+  .rail li { position: relative; padding: 0 0 24px 36px; }
+  .rail li::before { 
+    content: ""; position: absolute; left: 0; top: 2px; width: 24px; height: 24px; 
+    border-radius: 50%; background: var(--card); border: 4px solid var(--deterministic); 
+    box-shadow: 0 0 0 4px var(--card);
+  }
+  .rail li.llm::before { border-color: var(--llm); } 
+  .rail li.auto::before { border-color: var(--auto); } 
+  .rail li.human::before { border-color: var(--human); }
+  
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
+}
+
