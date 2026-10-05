@@ -2,6 +2,7 @@ import { staffFetch, TicketSummary } from "@/lib/api";
 import { clsx } from "clsx";
 import Link from "next/link";
 import { Activity, AlertTriangle, ShieldAlert, Cpu, Network, Truck, Power, Play, Pause, Settings2 } from "lucide-react";
+import AutomationSwitch from "./AutomationSwitch";
 
 export const dynamic = "force-dynamic";
 
@@ -43,14 +44,7 @@ export default async function OperationsPage() {
         </div>
         
         {/* Automation Level Switch */}
-        <div className="flex items-center gap-4 bg-[#161b22] border border-[#30363d] p-1 rounded-sm">
-          <div className="text-xs text-[#8b949e] font-bold px-2 flex items-center gap-2"><Cpu className="w-4 h-4"/> AUTOPILOT</div>
-          <div className="flex bg-[#0d1117] border border-[#30363d]">
-            <button className="px-4 py-1 text-xs font-bold hover:bg-[#f85149] hover:text-white transition-colors text-[#8b949e]">OFF</button>
-            <button className="px-4 py-1 text-xs font-bold hover:bg-[#d29922] hover:text-white transition-colors text-[#8b949e] border-x border-[#30363d]">SUGGEST</button>
-            <button className="px-4 py-1 text-xs font-bold bg-[#3fb950] text-[#0d1117] shadow-[0_0_10px_rgba(63,185,80,0.4)]">AUTO</button>
-          </div>
-        </div>
+        <AutomationSwitch />
       </div>
 
       {/* System Health Strip */}
